@@ -1,8 +1,8 @@
 /*!
  * jQuery Search Among Plugin
  * https://github.com/glebkema/jquery-search-among
- * 
- * Version: 0.2.1
+ *
+ * Version: 0.2.2
  *
  * Copyright Gleb Kemarsky
  * Released under the MIT license.
@@ -11,25 +11,24 @@
 (function ($) {
 
     $.fn.searchAmong = function($items) {
-        let oldSearch = '';
+        let searchWords = [];
 
         $(this).on('input', function() {
-            let newSearch = this.value.trim().toLowerCase();
-            if (newSearch !== oldSearch) {
-                oldSearch = newSearch;
-                if (newSearch) {
-                    let words = newSearch.split(/\s+/);
-                    let count = words.length;
+            let newWords = this.value.trim().toLowerCase().split(/\s+/).sort();
+            if (areArraysDifferent(searchWords, newWords)) {
+                searchWords = newWords;
+                if (searchWords) {
+                    let count = searchWords.length;
                     for (let item of $items) {
                         let text = $(item).text().toLowerCase();
-                        let is_visible = true;
+                        let isVisible = true;
                         for (let i = 0; i < count; i++) {
-                            if (-1 === text.indexOf(words[i])) {
-                                is_visible = false;
+                            if (-1 === text.indexOf(searchWords[i])) {
+                                isVisible = false;
                                 break;
                             }
                         }
-                        $(item).toggle(is_visible);
+                        $(item).toggle(isVisible);
                     }
                 }
                 else {
@@ -37,6 +36,12 @@
                 }
             }
         });
+
+        function areArraysDifferent(array1, array2) {
+            return array1.length !== array2.length || array1.some(function(value, index) {
+                return value !== array2[index];
+            });
+        }
 
         return this;
     };
