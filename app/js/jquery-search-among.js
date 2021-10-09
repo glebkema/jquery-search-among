@@ -2,7 +2,7 @@
  * jQuery Search Among Plugin
  * https://github.com/glebkema/jquery-search-among
  *
- * Version: 0.2.2
+ * Version: 0.2.3
  *
  * Copyright Gleb Kemarsky
  * Released under the MIT license.
@@ -14,8 +14,9 @@
         let searchWords = [];
 
         $(this).on('input', function() {
-            let newWords = this.value.trim().toLowerCase().split(/\s+/).sort();
+            let newWords = getWords(this.value);
             if (areArraysDifferent(searchWords, newWords)) {
+                console.log(newWords);
                 searchWords = newWords;
                 if (searchWords) {
                     let count = searchWords.length;
@@ -41,6 +42,35 @@
             return array1.length !== array2.length || array1.some(function(value, index) {
                 return value !== array2[index];
             });
+        }
+
+        function filterConstraints(words) {
+            words.sort(function(a, b) {
+                return b.length - a.length;
+            });
+
+            let filtered = [];
+            let filteredLength = 0;
+            checkWords: for (let wordsIndex = 0, wordsLength = words.length; wordsIndex < wordsLength; wordsIndex++) {
+                let word = words[wordsIndex];
+                for (let j = 0; j < filteredLength; j++) {
+                    if (filtered[j].indexOf(word) > -1) {
+                        continue checkWords;
+                    }
+                }
+                filtered[filteredLength++] = word;
+            }
+            return filtered;
+        }
+
+        function getWords(value) {
+            value = value.trim();
+            if ('' === value) {
+                return [];
+            }
+
+            let words = value.toLowerCase().split(/\s+/);
+            return filterConstraints(words).sort();
         }
 
         return this;
