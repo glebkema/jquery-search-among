@@ -2,7 +2,7 @@
  * jQuery Search Among Plugin
  * https://github.com/glebkema/jquery-search-among
  *
- * Version: 0.2.3
+ * Version: 0.2.4
  *
  * Copyright Gleb Kemarsky
  * Released under the MIT license.
@@ -10,18 +10,19 @@
 
 (function ($) {
 
-    $.fn.searchAmong = function($items) {
+    $.fn.searchAmong = function(itemsSelector) {
         let searchWords = [];
 
         $(this).on("input", function() {
             let newWords = getWords(this.value);
             if (areArraysDifferent(searchWords, newWords)) {
-                console.log(newWords);
                 searchWords = newWords;
+                let $items = $.find(itemsSelector);  // prevent the selector from being interpreted as HTML: https://lgtm.com/rules/1511421786841/
                 if (searchWords) {
                     let count = searchWords.length;
                     for (let item of $items) {
-                        let text = $(item).text().toLowerCase();
+                        let $item = $(item);
+                        let text = $item.text().toLowerCase();
                         let isVisible = true;
                         for (let i = 0; i < count; i++) {
                             if (-1 === text.indexOf(searchWords[i])) {
@@ -29,7 +30,7 @@
                                 break;
                             }
                         }
-                        $(item).toggle(isVisible);
+                        $item.toggle(isVisible);
                     }
                 }
                 else {
